@@ -3,10 +3,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 #include <err.h>
 #include <errno.h>
 
-#define MIN_CAP 16
+#define DYNAMIC_ARRAY_MIN_CAP 16
+
+#define DYNAMIC_ARRAY_B_RED "\x1b[91m"
+#define DYNAMIC_ARRAY_RESET "\x1b[0m"
+#define DYNAMIC_ARRAY_STRINGIFY(x) #x
 
 #define getLen(arrayStruct) (arrayStruct->len)
 #define getCap(arrayStruct) (arrayStruct->cap)
@@ -41,12 +47,12 @@ arrStruct *free_##arrStruct(arrStruct *self);\
 		arrStruct *self = (arrStruct *)malloc(sizeof(arrStruct));\
 		\
 		if (self == NULL) {\
-			fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" RESET, cap, strerror(errno));\
+			fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" DYNAMIC_ARRAY_RESET, cap, strerror(errno));\
 			exit(errno);\
 		}\
 		\
-		if (cap < MIN_CAP) {\
-			cap = MIN_CAP;\
+		if (cap < DYNAMIC_ARRAY_MIN_CAP) {\
+			cap = DYNAMIC_ARRAY_MIN_CAP;\
 		}\
 		\
 		self->cap = cap;\
@@ -54,12 +60,12 @@ arrStruct *free_##arrStruct(arrStruct *self);\
 		self->array = (type *)malloc(sizeof(type) * cap);\
 		\
 		if (self->array == NULL) {\
-			fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" RESET, cap, strerror(errno));\
+			fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" DYNAMIC_ARRAY_RESET, cap, strerror(errno));\
 			exit(errno);\
 		}\
 		\
-		/* printf(BRI_MAGENTA "> sizeof(" STRINGIFY(arrStruct) "): %zu\n" RESET, sizeof(*self)); */\
-		/* printf(BRI_MAGENTA "> sizeof(" STRINGIFY(arrStruct) "->array) * cap: %zu\n" RESET, sizeof(*self->array) * self->cap); */\
+		/* printf(BRI_MAGENTA "> sizeof(" DYNAMIC_ARRAY_STRINGIFY(arrStruct) "): %zu\n" DYNAMIC_ARRAY_RESET, sizeof(*self)); */\
+		/* printf(BRI_MAGENTA "> sizeof(" DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array) * cap: %zu\n" DYNAMIC_ARRAY_RESET, sizeof(*self->array) * self->cap); */\
 		\
 		return self;\
 	}\
@@ -95,7 +101,7 @@ bool maintain_##arrStruct(arrStruct *self) {\
 	type *tempArr = (type *)realloc(self->array, sizeof(*self->array) * new_cap);\
 	\
 	if (tempArr == NULL) {\
-		fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array realloc failed when appending for cap: %zu: %s\n" RESET, self->cap, strerror(errno));\
+		fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array realloc failed when appending for cap: %zu: %s\n" DYNAMIC_ARRAY_RESET, self->cap, strerror(errno));\
 		exit(errno);\
 		\
 	}\
@@ -108,7 +114,7 @@ bool maintain_##arrStruct(arrStruct *self) {\
 \
 void pop_##arrStruct(arrStruct *self) {\
 	if (self->len <= 0) {\
-		fprintf(stderr, B_RED STRINGIFY(arrStruct) "Underflow\n" RESET);\
+		fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "Underflow\n" DYNAMIC_ARRAY_RESET);\
 		return;\
 	}\
 	\
@@ -118,14 +124,14 @@ void pop_##arrStruct(arrStruct *self) {\
 	if (self->len * 4 < self->cap) {\
 		self->cap /= 2;\
 		\
-		if (self->cap < MIN_CAP) {\
-			self->cap = MIN_CAP;\
+		if (self->cap < DYNAMIC_ARRAY_MIN_CAP) {\
+			self->cap = DYNAMIC_ARRAY_MIN_CAP;\
 		}\
 		\
 		type *tempArr = (type *)realloc(self->array, sizeof(type) * self->cap);\
 		\
 		if (tempArr == NULL) {\
-			fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array realloc failed when popping for cap: %zu\n" RESET, self->cap);\
+			fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array realloc failed when popping for cap: %zu\n" DYNAMIC_ARRAY_RESET, self->cap);\
 			exit(errno);\
 		}\
 		\
@@ -175,12 +181,12 @@ arrStruct *free_##arrStruct(arrStruct *self);\
 		arrStruct *self = (arrStruct *)malloc(sizeof(arrStruct));\
 		\
 		if (self == NULL) {\
-			fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" RESET, cap, strerror(errno));\
+			fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" DYNAMIC_ARRAY_RESET, cap, strerror(errno));\
 			exit(errno);\
 		}\
 		\
-		if (cap < MIN_CAP) {\
-			cap = MIN_CAP;\
+		if (cap < DYNAMIC_ARRAY_MIN_CAP) {\
+			cap = DYNAMIC_ARRAY_MIN_CAP;\
 		}\
 		\
 		self->cap = cap;\
@@ -188,7 +194,7 @@ arrStruct *free_##arrStruct(arrStruct *self);\
 		self->array = (type **)malloc(sizeof(*self->array) * self->cap);\
 		\
 		if (self->array == NULL) {\
-			fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" RESET, cap, strerror(errno));\
+			fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array malloc failed for cap = %zu: %s\n" DYNAMIC_ARRAY_RESET, cap, strerror(errno));\
 			exit(errno);\
 		}\
 		\
@@ -196,8 +202,8 @@ arrStruct *free_##arrStruct(arrStruct *self);\
 			self->array[i] = NULL;\
 		}\
 		\
-		/* printf(BRI_MAGENTA "> sizeof(" STRINGIFY(arrStruct) "): %zu\n" RESET, sizeof(*self)); */\
-		/* printf(BRI_MAGENTA "> sizeof(" STRINGIFY(arrStruct) "->array) * cap: %zu\n" RESET, sizeof(*self->array) * self->cap); */\
+		/* printf(BRI_MAGENTA "> sizeof(" DYNAMIC_ARRAY_STRINGIFY(arrStruct) "): %zu\n" DYNAMIC_ARRAY_RESET, sizeof(*self)); */\
+		/* printf(BRI_MAGENTA "> sizeof(" DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array) * cap: %zu\n" DYNAMIC_ARRAY_RESET, sizeof(*self->array) * self->cap); */\
 		\
 		return self;\
 	}\
@@ -233,7 +239,7 @@ bool maintain_##arrStruct(arrStruct *self) {\
 	type **tempArr = (type **)realloc(self->array, sizeof(*self->array) * new_cap);\
 	\
 	if (tempArr == NULL) {\
-		fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array realloc failed when appending for cap: %zu: %s\n" RESET, self->cap, strerror(errno));\
+		fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array realloc failed when appending for cap: %zu: %s\n" DYNAMIC_ARRAY_RESET, self->cap, strerror(errno));\
 		exit(errno);\
 		\
 	}\
@@ -250,7 +256,7 @@ bool maintain_##arrStruct(arrStruct *self) {\
 \
 void pop_##arrStruct(arrStruct *self) {\
 	if (self->len <= 0) {\
-		fprintf(stderr, B_RED STRINGIFY(arrStruct) "Underflow\n" RESET);\
+		fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "Underflow\n" DYNAMIC_ARRAY_RESET);\
 		return;\
 	}\
 	\
@@ -260,14 +266,14 @@ void pop_##arrStruct(arrStruct *self) {\
 	if (self->len * 4 < self->cap) {\
 		self->cap /= 2;\
 		\
-		if (self->cap < MIN_CAP) {\
-			self->cap = MIN_CAP;\
+		if (self->cap < DYNAMIC_ARRAY_MIN_CAP) {\
+			self->cap = DYNAMIC_ARRAY_MIN_CAP;\
 		}\
 		\
 		type **tempArr = (type **)realloc(self->array, sizeof(*self->array) * self->cap);\
 		\
 		if (tempArr == NULL) {\
-			fprintf(stderr, B_RED STRINGIFY(arrStruct) "->array realloc failed when popping for cap: %zu\n" RESET, self->cap);\
+			fprintf(stderr, DYNAMIC_ARRAY_B_RED DYNAMIC_ARRAY_STRINGIFY(arrStruct) "->array realloc failed when popping for cap: %zu\n" DYNAMIC_ARRAY_RESET, self->cap);\
 			exit(errno);\
 		}\
 		\
