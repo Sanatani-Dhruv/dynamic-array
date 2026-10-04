@@ -12,4 +12,9 @@ ARRAY_OF_POINTER_IMPLEMENT(int, intPointerArray, freeint)
 
 int main() {
 
+	intArray *array = init_intArray(256);
+
+	free_intArray(array);
 }
+
+/* Next Feature, for_##array macro to interate every index and get key */
